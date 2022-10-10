@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 10, 2022 at 03:50 PM
--- Server version: 10.4.14-MariaDB
--- PHP Version: 7.4.10
+-- Generation Time: Oct 10, 2022 at 07:22 PM
+-- Server version: 10.4.11-MariaDB
+-- PHP Version: 7.2.31
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `uni`
+-- Database: `invoice`
 --
 
 -- --------------------------------------------------------
@@ -50,17 +50,34 @@ INSERT INTO `customer` (`customer_id`, `customer_name`, `customer_address`, `cus
 --
 
 CREATE TABLE `orders` (
+  `invoice_id` int(11) NOT NULL,
   `order_id` int(11) NOT NULL,
   `product_id` int(6) NOT NULL,
-  `qty` int(6) NOT NULL
+  `qty` int(6) NOT NULL,
+  `total_price` int(6) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`order_id`, `product_id`, `qty`) VALUES
-(1, 0, 0);
+INSERT INTO `orders` (`invoice_id`, `order_id`, `product_id`, `qty`, `total_price`) VALUES
+(1, 1, 0, 0, 0),
+(2, 7, 1, 5, 625),
+(3, 8, 1, 15, 1875),
+(4, 8, 1, 1, 125),
+(5, 8, 6, 20, 13000),
+(6, 8, 4, 10, 350),
+(7, 9, 1, 10, 1250),
+(8, 9, 1, 0, 0),
+(9, 10, 7, 0, 0),
+(10, 11, 1, 10, 1250),
+(11, 11, 1, 20, 2500),
+(12, 12, 1, 10, 1250),
+(13, 12, 5, 30, 1050),
+(14, 12, 5, 0, 0),
+(15, 13, 1, 15, 1875),
+(16, 13, 6, 20, 13000);
 
 -- --------------------------------------------------------
 
@@ -103,7 +120,7 @@ ALTER TABLE `customer`
 -- Indexes for table `orders`
 --
 ALTER TABLE `orders`
-  ADD PRIMARY KEY (`order_id`);
+  ADD PRIMARY KEY (`invoice_id`);
 
 --
 -- Indexes for table `products`
@@ -120,6 +137,12 @@ ALTER TABLE `products`
 --
 ALTER TABLE `customer`
   MODIFY `customer_id` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `products`

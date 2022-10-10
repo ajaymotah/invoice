@@ -1,12 +1,37 @@
 <?php
+session_start();
 include('includes/database.php');
+//set items count
+if(!isset($_SESSION['items']))
+{
+  $items=0;
+  $_SESSION['items']=$items;
+}
+
+
+
+
+
 //get last inserted order_id
-if (!isset($_POST['order_id'])){
+if (!isset($_SESSION['order_id'])){
 $sql_last_order_id="SELECT MAX(order_id) AS order_id FROM orders";
 $result_order_id = $conn->query($sql_last_order_id);
 $row_order_id = $result_order_id->fetch_assoc();
 $order_id=$row_order_id['order_id']+1;
+$_SESSION['order_id']=$order_id;
 //print_r($order_id);
+}
+else{
+$order_id=$_SESSION['order_id'];
+// $sql_get_order_details="SELECT * FROM orders, products WHERE orders.product_id=products.product_id AND orders.order_id=$order_id";
+// $query_get_orders=$conn->query($sql_get_order_details);
+// $result_get_orders=$query_get_orders->fetch_assoc();
+// $row_orders_qty=$result_get_orders['qty'];
+
+if($_SESSION['items']!=0){
+  $show_items_count=$_SESSION['items']-1;
+  //$show_qty.=$row_orders_qty
+}
 }
  ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -70,8 +95,8 @@ $order_id=$row_order_id['order_id']+1;
               <td>
                 <form name="frm_add_product" class="form" action="calculate_total.php" method="post">
                   <input type="text" name="customer_id" hidden value="<?php echo $_GET['customer_id']; ?>">
-                  <button type="submit" name="btn_add_product">Add Product</button>
-                  <a href="index.php">New Customer</a>
+                  <!-- <button type="submit" name="btn_add_product">Add Product</button> -->
+                  <a href="close_invoice.php">New Customer</a>
                 </form>
 
 
@@ -89,7 +114,7 @@ $order_id=$row_order_id['order_id']+1;
     <td width="200" height="100"><div align="center" class="style5">Total</div></td>
 
   </tr>
-  <form name="frm_calculate_products" method="POST" action="<?php echo 'calculate_total.php?customer_id='.$_GET['customer_id'].'&order_id='.$order_id; ?>">
+  <form name="frm_calculate_products" method="POST" action="<?php echo 'get_customer_details.php?customer_id='.$_GET['customer_id'].'&order_id='.$order_id; ?>">
 
     <?php
     if(isset($_GET['customer_id'])){
@@ -98,33 +123,48 @@ $order_id=$row_order_id['order_id']+1;
 
       $sql_get_products="SELECT * FROM products";
       $result_products = $conn->query($sql_get_products);
+      $lst_products='';
       while($row_prod=$result_products->fetch_assoc()){
-        $lst_products='';
+        //$lst_products='';
         $lst_products.= '<option value="'.$row_prod['product_id'].'">'.$row_prod['product_name']. '</option>';
       }
+//show items by invoice
+if($_SESSION['items']!=0){
+   $sql_get_order_details="SELECT * FROM orders, products WHERE orders.product_id=products.product_id AND orders.order_id=$order_id ORDER BY invoice_id";
+   $query_get_orders=$conn->query($sql_get_order_details);
+   while($row_get_orders=$query_get_orders->fetch_assoc()){
+     echo
+     '<tr>
+      <td>'.$row_get_orders['qty'].'</td>
+      <td>'.$row_get_orders['product_name'].'</td>
+      <td>'.$row_get_orders['product_ref'].'</td>
+      <td>'.$row_get_orders['product_barcode'].'</td>
+      <td>'.$row_get_orders['product_price'].'</td>
+      <td>'.$row_get_orders['total_price'].'</td>
+     </tr>';
+   }
+}
 
-      $i=10;
-      for ($i=0;$i<10;$i++){
+      //$i=10;
+      for ($i=0;$i<1;$i++){
         echo '
 
         <tr>
           <td>
             <input type="text" name="txt_qty'.$i.'" value="">
-
           </td>
           <td>
-
-          <select name="slt_product'.$i.'">
+          <select name="lst_product'.$i.'">
           '.$lst_products.'
           </select>
-          <input type="text" name="product_row" value="'.$i.'">
-
+          <input type="text" name="product_row" value="'.$i.'" hidden>
 
           <button type="submit" name="btn_add_products"> Add Product </button>
 
           </td>
-          <input name="txt_ref'.$i.'" placeholder="">
+
           <td>
+          <input type="text" name="txt_ref'.$i.'">
           </td>
           <td>
           </td>
@@ -141,7 +181,15 @@ $order_id=$row_order_id['order_id']+1;
   <tr>
     <td height="50" colspan="4">&nbsp;</td>
     <td height="50" bgcolor="#00FF00"><div align="center" class="style8"><span class="style6">Net Total </span></div></td>
-    <td height="50" bgcolor="#000000"><div align="center" class="style5"></div></td>
+    <td height="50" >
+      <?php
+      //get total
+      $sql_total="SELECT SUM(total_price) AS total_sum FROM orders WHERE order_id=$order_id";
+      $query_total=$conn->query($sql_total);
+      $row_total = $query_total->fetch_assoc();
+       ?>
+      <div align="center" style="font-color:black;font-weight: bold;font-size: 36px;"><?php echo $row_total['total_sum']; ?></div>
+    </td>
   </tr>
 </table>
 
