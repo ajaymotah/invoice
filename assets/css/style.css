@@ -1,0 +1,28 @@
+.style5 {font-size: 36px; color: #FFFFFF; font-weight: bold; }
+.style6 {font-size: 36px}
+.style7 {
+	font-size: 24px;
+	font-weight: bold;
+	color: #0000FF;
+}
+.style8 {
+	color: #FFFF66;
+	font-weight: bold;
+}
+
+body
+{
+background-attachment: fixed;
+}
+table .main {
+  width: 100%;
+}
+
+td {
+  height: 70px;
+  text-align: left;
+}
+input {
+    border: none;
+    background-color: transparent;
+ }
